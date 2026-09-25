@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Rescue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf8f3;
+      --bg-secondary: #f0ede6;
+      --text-primary: #2d2d2d;
+      --text-secondary: #5a5a5a;
+      --accent-mustard: #d4a574;
+      --accent-tomato: #c95d4a;
+      --border-color: #d4cfc8;
+      --error-color: #c95d4a;
+      --success-color: #6b8e23;
+      --pill-bg: #e8e3dc;
+      --pill-text: #2d2d2d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1f1f1f;
+        --bg-secondary: #2a2a2a;
+        --text-primary: #f0ede6;
+        --text-secondary: #c8c8c8;
+        --accent-mustard: #d4a574;
+        --accent-tomato: #d9755f;
+        --border-color: #3a3a3a;
+        --error-color: #d9755f;
+        --success-color: #8fbc58;
+        --pill-bg: #3a3a3a;
+        --pill-text: #f0ede6;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Merriweather", serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent-tomato);
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .input-section {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .photo-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: 0;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      background-color: var(--bg-primary);
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .photo-upload.drag-over {
+      border-color: var(--accent-mustard);
+      background-color: var(--bg-secondary);
+    }
+
+    .photo-upload input[type="file"] {
+      display: none;
+    }
+
+    .upload-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .photo-preview {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 1rem;
+      border: 1px solid var(--border-color);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      resize: vertical;
+    }
+
+    .vibe-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .vibe-chip {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: "Merriweather", serif;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .vibe-chip:hover {
+      border-color: var(--accent-mustard);
+      background-color: var(--bg-secondary);
+    }
+
+    .vibe-chip.selected {
+      border-color: var(--accent-tomato);
+      background-color: var(--accent-tomato);
+      color: #fff;
+    }
+
+    button {
+      font-family: "Merriweather", serif;
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.5rem;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--accent-tomato);
+      background-color: var(--accent-tomato);
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-line {
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      margin-bottom: 1.5rem;
+      min-height: 1.2rem;
+    }
+
+    .status-line.success {
+      color: var(--success-color);
+    }
+
+    .status-line.error {
+      color: var(--error-color);
+    }
+
+    .status-line.loading {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .ingredients-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .pill {
+      padding: 0.4rem 0.75rem;
+      background-color: var(--pill-bg);
+      border: 1px solid var(--border-color);
+      color: var(--pill-text);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+    }
+
+    .recipes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 680px) {
+      .recipes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .recipe-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-secondary);
+      perspective: 1000px;
+      min-height: 300px;
+    }
+
+    .recipe-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .recipe-card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .recipe-card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .recipe-card-front {
+      background-color: var(--bg-secondary);
+    }
+
+    .recipe-card-back {
+      background-color: var(--bg-secondary);
+      transform: rotateY(180deg);
+      overflow-y: auto;
+    }
+
+    .recipe-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent-tomato);
+      margin-bottom: 0.5rem;
+    }
+
+    .recipe-tagline {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .flip-button {
+      align-self: flex-start;
+      margin-top: auto;
+    }
+
+    .recipe-ingredients-list {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      list-style: none;
+    }
+
+    .recipe-ingredients-list li {
+      margin-bottom: 0.4rem;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .recipe-ingredients-list li:before {
+      content: "• ";
+      position: absolute;
+      left: 0;
+      color: var(--accent-mustard);
+    }
+
+    .recipe-steps {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      list-style: none;
+    }
+
+    .recipe-steps li {
+      margin-bottom: 0.6rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .recipe-steps li:before {
+      content: counter(step) ". ";
+      counter-increment: step;
+      position: absolute;
+      left: 0;
+      font-weight: 600;
+      color: var(--accent-tomato);
+    }
+
+    .recipe-steps {
+      counter-reset: step;
+    }
+
+    .missing-section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .missing-label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--accent-mustard);
+      margin-bottom: 0.4rem;
+    }
+
+    .missing-items {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      list-style: none;
+    }
+
+    .missing-items li {
+      margin-bottom: 0.3rem;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .missing-items li:before {
+      content: "○ ";
+      position: absolute;
+      left: 0;
+      color: var(--accent-tomato);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 2rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Recipe Rescue</h1>
+      <p class="tagline">Turn your fridge into dinner. No judgment.</p>
+    </header>
+
+    <div class="input-section">
+      <form id="recipeForm">
+        <!-- Photo Upload -->
+        <div class="form-group">
+          <label for="photoUpload">Fridge Photo (optional)</label>
+          <div class="photo-upload" id="photoDropZone">
+            <input type="file" id="photoUpload" accept="image/*">
+            <p class="upload-text">Drag & drop a photo or click to select</p>
+            <img id="photoPreview" class="photo-preview" style="display: none;">
+          </div>
+        </div>
+
+        <!-- Ingredients List -->
+        <div class="form-group">
+          <label for="ingredientsList">What You Have (optional)</label>
+          <textarea id="ingredientsList" placeholder="tomatoes, garlic, olive oil, pasta, basil...&#10;(comma-separated or one per line)"></textarea>
+        </div>
+
+        <!-- Vibe Selector -->
+        <div class="form-group">
+          <label>Cooking Vibe</label>
+          <div class="vibe-selector" id="vibeSelector">
+            <button type="button" class="vibe-chip" data-vibe="broke" data-prompt="I'm a broke college student who can make something delicious with basically nothing and pantry staples. Keep it cheap, keep it filling, keep it fast.">💸 Broke College Student</button>
+            <button type="button" class="vibe-chip" data-vibe="impress" data-prompt="I'm trying to impress someone important tonight. I can make something look fancy and taste amazing with limited ingredients. Show me my best self in the kitchen.">✨ Trying to Impress</button>
+            <button type="button" class="vibe-chip" data-vibe="lazy" data-prompt="It's a lazy Sunday and I want something comforting and low-effort. Minimal cooking, maximum coziness. Preferably something I can make while wearing pajamas.">🛋️ Lazy Sunday</button>
+            <button type="button" class="vibe-chip" data-vibe="mealprep" data-prompt="I'm meal-prepping for the week. Give me recipes that scale well, store nicely, and won't bore me by day 4. Efficiency meets flavor.">🥗 Meal-Prep Grind</button>
+            <button type="button" class="vibe-chip" data-vibe="chaos" data-prompt="It's 2am and I'm in the kitchen with chaotic energy. Give me something unhinged and ridiculous that somehow works. No fear, no filter, just vibes.">🌙 2am Chaos Cooking</button>
+          </div>
+        </div>
+
+        <!-- Submit & Status -->
+        <div class="form-group">
+          <div class="button-group">
+            <button type="submit" id="submitBtn">Cook Something Up</button>
+            <button type="button" id="clearBtn">Clear</button>
+          </div>
+        </div>
+        <div class="status-line" id="statusLine"></div>
+      </form>
+    </div>
+
+    <!-- Detected Ingredients -->
+    <div id="detectedIngredientsContainer" style="display: none;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--accent-mustard);">Detected Ingredients</h2>
+      <div class="ingredients-list" id="detectedIngredients"></div>
+    </div>
+
+    <!-- Recipes Output -->
+    <div id="recipesContainer" style="display: none;">
+      <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--accent-tomato);">Your Recipes</h2>
+      <div class="recipes-grid" id="recipesGrid"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display: none;">
+      No recipes yet. Upload a photo or type your ingredients and pick a vibe to get started.
+    </div>
+  </div>
+
+  <script>
+    // ============================================================================
+    // CONFIG
+    // ============================================================================
+    const NVIDIA_API_KEY = "PASTE_YOUR_NVAPI_KEY_HERE";
+    const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
+    const VISION_MODEL = "meta/llama-4-scout-17b-16e-instruct";
+
+    // ============================================================================
+    // STATE
+    // ============================================================================
+    let selectedVibe = null;
+    let uploadedPhoto = null;
+    let photoBase64 = null;
+
+    // ============================================================================
+    // ELEMENTS
+    // ============================================================================
+    const recipeForm = document.getElementById("recipeForm");
+    const photoUpload = document.getElementById("photoUpload");
+    const photoDropZone = document.getElementById("photoDropZone");
+    const photoPreview = document.getElementById("photoPreview");
+    const ingredientsList = document.getElementById("ingredientsList");
+    const vibeSelector = document.getElementById("vibeSelector");
+    const submitBtn = document.getElementById("submitBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusLine = document.getElementById("statusLine");
+    const detectedIngredientsContainer = document.getElementById("detectedIngredientsContainer");
+    const detectedIngredients = document.getElementById("detectedIngredients");
+    const recipesContainer = document.getElementById("recipesContainer");
+    const recipesGrid = document.getElementById("recipesGrid");
+    const emptyState = document.getElementById("emptyState");
+
+    // ============================================================================
+    // PHOTO UPLOAD HANDLERS
+    // ============================================================================
+    photoDropZone.addEventListener("click", () => photoUpload.click());
+
+    photoDropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      photoDropZone.classList.add("drag-over");
+    });
+
+    photoDropZone.addEventListener("dragleave", () => {
+      photoDropZone.classList.remove("drag-over");
+    });
+
+    photoDropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      photoDropZone.classList.remove("drag-over");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handlePhotoSelect(files[0]);
+      }
+    });
+
+    photoUpload.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handlePhotoSelect(e.target.files[0]);
+      }
+    });
+
+    function handlePhotoSelect(file) {
+      if (!file.type.startsWith("image/")) {
+        statusLine.textContent = "Please select a valid image file.";
+        statusLine.classList = "status-line error";
+        return;
+      }
+
+      uploadedPhoto = file;
+      photoPreview.src = URL.createObjectURL(file);
+      photoPreview.style.display = "block";
+      photoDropZone.querySelector(".upload-text").textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        photoBase64 = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ============================================================================
+    // VIBE SELECTION
+    // ============================================================================
+    vibeSelector.addEventListener("click", (e) => {
+      if (e.target.classList.contains("vibe-chip")) {
+        e.preventDefault();
+        document.querySelectorAll(".vibe-chip").forEach((chip) => {
+          chip.classList.remove("selected");
+        });
+        e.target.classList.add("selected");
+        selectedVibe = {
+          vibe: e.target.dataset.vibe,
+          prompt: e.target.dataset.prompt,
+        };
+      }
+    });
+
+    // ============================================================================
+    // CLEAR BUTTON
+    // ============================================================================
+    clearBtn.addEventListener("click", () => {
+      recipeForm.reset();
+      photoUpload.value = "";
+      photoPreview.style.display = "none";
+      photoPreview.src = "";
+      uploadedPhoto = null;
+      photoBase64 = null;
+      ingredientsList.value = "";
+      selectedVibe = null;
+      document.querySelectorAll(".vibe-chip").forEach((chip) => {
+        chip.classList.remove("selected");
+      });
+      statusLine.textContent = "";
+      statusLine.className = "status-line";
+      detectedIngredientsContainer.style.display = "none";
+      recipesContainer.style.display = "none";
+      emptyState.style.display = "block";
+      recipesGrid.innerHTML = "";
+      detectedIngredients.innerHTML = "";
+      photoDropZone.querySelector(".upload-text").textContent = "Drag & drop a photo or click to select";
+    });
+
+    // ============================================================================
+    // UTILITY: PARSE JSON DEFENSIVELY
+    // ============================================================================
+    function parseJSONSafely(text) {
+      try {
+        let cleaned = text.trim();
+        // Remove markdown code fences if present
+        if (cleaned.startsWith("```")) {
+          cleaned = cleaned.replace(/^```(?:json)?\n/, "").replace(/\n```$/, "");
+        }
+        return JSON.parse(cleaned);
+      } catch (error) {
+        throw new Error(`Failed to parse JSON: ${error.message}`);
+      }
+    }
+
+    // ============================================================================
+    // UTILITY: EXTRACT INGREDIENTS FROM TEXT
+    // ============================================================================
+    function parseIngredientsFromText(text) {
+      if (!text.trim()) return [];
+      return text
+        .split(/[,\n]/)
+        .map((item) => item.trim().toLowerCase())
+        .filter((item) => item.length > 0);
+    }
+
+    // ============================================================================
+    // API: DETECT INGREDIENTS FROM PHOTO
+    // ============================================================================
+    async function detectIngredientsFromPhoto(base64Image) {
+      const payload = {
+        model: VISION_MODEL,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Look at this fridge/pantry photo and list ONLY the individual food ingredients you can identify. Return as a JSON array of strings, like [\"tomato\", \"garlic\", \"olive oil\", \"basil\"]. Be specific but concise. Only ingredients, no dishes or prepared foods.",
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: base64Image,
+                },
+              },
+            ],
+          },
+        ],
+        max_tokens: 512,
+      };
+
+      const response = await fetch(NVIDIA_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${NVIDIA_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`NVIDIA API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      return parseJSONSafely(content);
+    }
+
+    // ============================================================================
+    // API: GENERATE RECIPES
+    // ============================================================================
+    async function generateRecipes(ingredients, vibePrompt) {
+      const ingredientList = ingredients.join(", ");
+
+      const systemPrompt = `You are a funny but competent home cook. You know how to make delicious food with limited ingredients and basic pantry staples like salt, pepper, oil, butter, garlic, onion, and soy sauce. You only suggest recipes using the ingredients provided, plus assumed pantry staples. You are creative, encouraging, and never judgmental about ingredient constraints.`;
+
+      const userPrompt = `${vibePrompt}
+
+Here are the ingredients I have: ${ingredientList}
+
+Give me exactly 3 recipes I can make with these. Return as a JSON array with objects in this format:
+[
+  {
+    "name": "Recipe Name",
+    "tagline": "Short fun description",
+    "ingredients": ["tomato", "basil", ...],
+    "steps": ["First do this", "Then do that", ...],
+    "missing": ["optional ingredient that would make it better"]
+  },
+  ...
+]
+
+Only include "missing" if there are optional improvements. Keep steps numbered and concise.`;
+
+      const payload = {
+        model: VISION_MODEL,
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+        max_tokens: 2048,
+      };
+
+      const response = await fetch(NVIDIA_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${NVIDIA_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`NVIDIA API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      return parseJSONSafely(content);
+    }
+
+    // ============================================================================
+    // RENDER: DETECTED INGREDIENTS PILLS
+    // ============================================================================
+    function renderDetectedIngredients(ingredients) {
+      detectedIngredients.innerHTML = "";
+      ingredients.forEach((ing) => {
+        const pill = document.createElement("div");
+        pill.className = "pill";
+        pill.textContent = ing;
+        detectedIngredients.appendChild(pill);
+      });
+      detectedIngredientsContainer.style.display = "block";
+    }
+
+    // ============================================================================
+    // RENDER: RECIPE CARD
+    // ============================================================================
+    function createRecipeCard(recipe) {
+      const card = document.createElement("div");
+      card.className = "recipe-card";
+
+      const innerDiv = document.createElement("div");
+      innerDiv.className = "recipe-card-inner";
+
+      // Front face
+      const front = document.createElement("div");
+      front.className = "recipe-card-face recipe-card-front";
+
+      const name = document.createElement("div");
+      name.className = "recipe-name";
+      name.textContent = recipe.name;
+
+      const tagline = document.createElement("div");
+      tagline.className = "recipe-tagline";
+      tagline.textContent = recipe.tagline;
+
+      const flipBtn = document.createElement("button");
+      flipBtn.className = "flip-button";
+      flipBtn.textContent = "Flip to see steps →";
+      flipBtn.type = "button";
+
+      front.appendChild(name);
+      front.appendChild(tagline);
+      front.appendChild(flipBtn);
+
+      // Back face
+      const back = document.createElement("div");
+      back.className = "recipe-card-face recipe-card-back";
+
+      const ingredientsTitle = document.createElement("div");
+      ingredientsTitle.style.fontWeight = "700";
+      ingredientsTitle.style.fontSize = "0.85rem";
+      ingredientsTitle.style.marginBottom = "0.5rem";
+      ingredientsTitle.style.color = "var(--accent-mustard)";
+      ingredientsTitle.textContent = "INGREDIENTS";
+
+      const ingredientsList = document.createElement("ul");
+      ingredientsList.className = "recipe-ingredients-list";
+      recipe.ingredients.forEach((ing) => {
+        const li = document.createElement("li");
+        li.textContent = ing;
+        ingredientsList.appendChild(li);
+      });
+
+      const stepsTitle = document.createElement("div");
+      stepsTitle.style.fontWeight = "700";
+      stepsTitle.style.fontSize = "0.85rem";
+      stepsTitle.style.marginBottom = "0.5rem";
+      stepsTitle.style.marginTop = "0.75rem";
+      stepsTitle.style.color = "var(--accent-tomato)";
+      stepsTitle.textContent = "STEPS";
+
+      const stepsList = document.createElement("ol");
+      stepsList.className = "recipe-steps";
+      recipe.steps.forEach((step) => {
+        const li = document.createElement("li");
+        li.textContent = step;
+        stepsList.appendChild(li);
+      });
+
+      back.appendChild(ingredientsTitle);
+      back.appendChild(ingredientsList);
+      back.appendChild(stepsTitle);
+      back.appendChild(stepsList);
+
+      // Missing items (if any)
+      if (recipe.missing && recipe.missing.length > 0) {
+        const missingDiv = document.createElement("div");
+        missingDiv.className = "missing-section";
+
+        const missingLabel = document.createElement("div");
+        missingLabel.className = "missing-label";
+        missingLabel.textContent = "Shopping List";
+
+        const missingList = document.createElement("ul");
+        missingList.className = "missing-items";
+        recipe.missing.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          missingList.appendChild(li);
+        });
+
+        missingDiv.appendChild(missingLabel);
+        missingDiv.appendChild(missingList);
+        back.appendChild(missingDiv);
+      }
+
+      // Flip event
+      flipBtn.addEventListener("click", () => {
+        innerDiv.classList.toggle("flipped");
+        flipBtn.textContent = innerDiv.classList.contains("flipped")
+          ? "← Back to name"
+          : "Flip to see steps →";
+      });
+
+      innerDiv.appendChild(front);
+      innerDiv.appendChild(back);
+      card.appendChild(innerDiv);
+
+      return card;
+    }
+
+    // ============================================================================
+    // RENDER: RECIPES GRID
+    // ============================================================================
+    function renderRecipes(recipes) {
+      recipesGrid.innerHTML = "";
+      recipes.forEach((recipe) => {
+        recipesGrid.appendChild(createRecipeCard(recipe));
+      });
+      recipesContainer.style.display = "block";
+      emptyState.style.display = "none";
+    }
+
+    // ============================================================================
+    // MAIN: FORM SUBMIT HANDLER
+    // ============================================================================
+    recipeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Validation
+      if (!selectedVibe) {
+        statusLine.textContent = "Please select a cooking vibe.";
+        statusLine.className = "status-line error";
+        return;
+      }
+
+      const hasPhoto = photoBase64 !== null;
+      const manualIngredients = parseIngredientsFromText(ingredientsList.value);
+      const hasManualIngredients = manualIngredients.length > 0;
+
+      if (!hasPhoto && !hasManualIngredients) {
+        statusLine.textContent = "Upload a photo or type some ingredients.";
+        statusLine.className = "status-line error";
+        return;
+      }
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      statusLine.textContent = "Cooking up recipes...";
+      statusLine.className = "status-line loading";
+
+      try {
+        let allIngredients = [...manualIngredients];
+
+        // Step 1: Extract ingredients from photo if provided
+        if (hasPhoto) {
+          statusLine.textContent = "Analyzing your fridge photo...";
+          const detectedFromPhoto = await detectIngredientsFromPhoto(photoBase64);
+          if (Array.isArray(detectedFromPhoto)) {
+            const photoIngredients = detectedFromPhoto
+              .map((ing) => ing.toLowerCase())
+              .filter((ing) => ing.length > 0);
+            renderDetectedIngredients(photoIngredients);
+            allIngredients = [...new Set([...allIngredients, ...photoIngredients])];
+          }
+        }
+
+        // Step 2: Generate recipes
+        statusLine.textContent = "Generating recipes...";
+        const recipes = await generateRecipes(allIngredients, selectedVibe.prompt);
+
+        if (!Array.isArray(recipes) || recipes.length === 0) {
+          throw new Error("No recipes returned from API");
+        }
+
+        // Step 3: Render recipes
+        renderRecipes(recipes);
+        statusLine.textContent = "✓ Ready to cook!";
+        statusLine.className = "status-line success";
+      } catch (error) {
+        console.error("Error:", error);
+        let errorMsg = error.message;
+        if (errorMsg.includes("PASTE_YOUR_NVAPI_KEY")) {
+          errorMsg = "Please add your NVIDIA API key to the script.";
+        } else if (errorMsg.includes("401") || errorMsg.includes("403")) {
+          errorMsg = "Invalid NVIDIA API key.";
+        } else if (errorMsg.includes("429")) {
+          errorMsg = "Rate limited. Please try again in a moment.";
+        }
+        statusLine.textContent = "Error: " + errorMsg;
+        statusLine.className = "status-line error";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Initialize empty state
+    emptyState.style.display = "block";
+  </script>
+</body>
+</html>
